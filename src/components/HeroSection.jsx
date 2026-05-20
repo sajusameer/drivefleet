@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function HeroSection() {
   return (
@@ -70,13 +71,17 @@ export default function HeroSection() {
 
             <div className="flex flex-wrap gap-5">
 
-              <button className="bg-[#ea001e] hover:bg-red-700 transition text-white px-8 py-4 rounded-md font-semibold">
+              <Link href={"/explore-cars"}>
+              <button className="bg-[#ea001e] hover:bg-white transition text-white hover:text-[#ea001e] px-8 py-4 rounded-md font-semibold">
                 Explore Cars
               </button>
-
+              </Link>
+             
+              <Link href={"/explore-cars"}>
               <button className="border border-[#ea001e] text-[#ea001e] px-8 py-4 rounded-md font-semibold hover:bg-[#ea001e] hover:text-white transition">
                 Learn More
               </button>
+                </Link>
 
             </div>
 

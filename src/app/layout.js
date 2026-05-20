@@ -2,6 +2,7 @@ import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
 import MainNavbar from "@/components/Navbar";
 import { Providers } from "./providers";
+import { Toaster } from "react-hot-toast";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -13,14 +14,9 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-export default function RootLayout({
-  children,
-}) {
+export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning >
       <body
         suppressHydrationWarning
         className={`${outfit.variable} ${inter.variable}`}
@@ -28,6 +24,7 @@ export default function RootLayout({
         <Providers>
           <MainNavbar />
           {children}
+          <Toaster/>
         </Providers>
       </body>
     </html>
