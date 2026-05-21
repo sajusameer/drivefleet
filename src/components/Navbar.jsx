@@ -85,26 +85,47 @@ export default function MainNavbar() {
   // LOGOUT
   // =========================
 
-  const handleLogout =
-    async () => {
+  // const handleLogout =
+  //   async () => {
 
-      try {
+  //     try {
 
-        setDropdown(false);
+  //       setDropdown(false);
 
-        await authClient.signOut();
+  //       await authClient.signOut();
 
-        router.push("/login");
+  //       router.push("/login");
 
-        router.refresh();
+  //       router.refresh();
 
-      } catch (error) {
+  //     } catch (error) {
 
-        console.log(error);
+  //       console.log(error);
 
-      }
+  //     }
 
-    };
+  //   };
+
+  const handleLogout = async () => {
+  try {
+
+    setDropdown(false);
+
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/login");
+          router.refresh();
+        },
+      },
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+};
 
   // =========================
   // NAV LINKS

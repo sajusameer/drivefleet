@@ -40,14 +40,16 @@ export default function LoginPage() {
     router.push("/");
   };
 
-  const handleGoogleLogin =
-    async () => {
-
-      await authClient.signIn.social({
-        provider: "google",
-      });
-
-    };
+ const handleGoogleLogin = async () => {
+  try {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4 text-white">
