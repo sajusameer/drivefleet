@@ -1,48 +1,92 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 export default function AddCarPage() {
 
   const router = useRouter();
 
+  // ✅ SESSION
+  const { data: session } =
+    authClient.useSession();
+
   const handleAddCar = async (e) => {
 
     e.preventDefault();
 
+    // LOGIN CHECK
+    if (!session?.user?.email) {
+      alert("Please login first");
+      return;
+    }
+
     const form = e.target;
 
     const carData = {
-      carName: form.carName.value,
-      price: form.price.value,
-      carType: form.carType.value,
-      image: form.image.value,
-      seats: form.seats.value,
-      location: form.location.value,
-      description: form.description.value,
-      availability: form.availability.value,
+
+      carName:
+        form.carName.value,
+
+      price:
+        form.price.value,
+
+      carType:
+        form.carType.value,
+
+      image:
+        form.image.value,
+
+      seats:
+        form.seats.value,
+
+      location:
+        form.location.value,
+
+      description:
+        form.description.value,
+
+      availability:
+        form.availability.value,
+
+      // ✅ USER EMAIL
+      userEmail:
+        session.user.email,
+
+      // OPTIONAL
+      userName:
+        session.user.name,
+
     };
 
     const res = await fetch(
       "http://localhost:5000/cars",
       {
         method: "POST",
+
         headers: {
           "Content-Type":
             "application/json",
         },
-        body: JSON.stringify(carData),
+
+        body: JSON.stringify(
+          carData
+        ),
       }
     );
 
-    const data = await res.json();
+    const data =
+      await res.json();
 
-    if (data.insertedId) {
+    if (
+      data.insertedId ||
+      data.acknowledged
+    ) {
 
       alert("Car Added");
 
       router.push(
-        "/explore-cars"
+        "/my-added-cars"
       );
     }
   };
@@ -134,7 +178,9 @@ export default function AddCarPage() {
           />
 
           <button className="bg-[#ea001e] py-5 rounded-2xl font-semibold md:col-span-2 hover:bg-red-700 transition">
+
             Add Car
+
           </button>
 
         </form>

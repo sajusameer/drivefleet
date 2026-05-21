@@ -1,5 +1,6 @@
 import HeroSection from '@/components/HeroSection';
 import SpecialOffers from '@/components/SpecialOffers';
+import Testimonials from '@/components/Testimonials';
 import React from 'react';
 
 const page = () => {
@@ -7,6 +8,7 @@ const page = () => {
  <main>
       <HeroSection />
       <SpecialOffers/>
+      <Testimonials/>
     </main>
   );
 };

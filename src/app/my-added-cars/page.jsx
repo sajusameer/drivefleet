@@ -2,77 +2,65 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 export default function MyAddedCars() {
 
-  const [cars, setCars] =
-    useState([]);
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [loading, setLoading] =
-    useState(true);
-
-  // TEMP USER EMAIL
-  const userEmail =
-    "demo@gmail.com";
-
-  // =========================
-  // FETCH MY CARS
-  // =========================
+  // ✅ Better Auth Session
+  const { data: session } = authClient.useSession();
 
   useEffect(() => {
 
+    // session load না হওয়া পর্যন্ত wait
+    if (!session?.user?.email) return;
+
     fetch(
-      `http://localhost:5000/my-cars/${userEmail}`
+      `http://localhost:5000/my-cars/${session.user.email}`
     )
       .then((res) => res.json())
       .then((data) => {
 
         setCars(data);
-
         setLoading(false);
 
       });
 
-  }, []);
+  }, [session]);
 
   // =========================
   // DELETE CAR
   // =========================
 
-  const handleDelete =
-    async (id) => {
+  const handleDelete = async (id) => {
 
-      const confirmDelete =
-        confirm(
-          "Delete this car?"
-        );
+    const confirmDelete = confirm(
+      "Delete this car?"
+    );
 
-      if (!confirmDelete) return;
+    if (!confirmDelete) return;
 
-      const res = await fetch(
-        `http://localhost:5000/cars/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.deletedCount > 0) {
-
-        const remainingCars =
-          cars.filter(
-            (car) =>
-              car._id !== id
-          );
-
-        setCars(
-          remainingCars
-        );
-
+    const res = await fetch(
+      `http://localhost:5000/cars/${id}`,
+      {
+        method: "DELETE",
       }
+    );
 
-    };
+    const data = await res.json();
+
+    if (data.deletedCount > 0) {
+
+      const remainingCars =
+        cars.filter(
+          (car) => car._id !== id
+        );
+
+      setCars(remainingCars);
+    }
+  };
 
   // =========================
   // LOADING
@@ -94,8 +82,6 @@ export default function MyAddedCars() {
 
       <div className="max-w-7xl mx-auto">
 
-        {/* HEADING */}
-
         <div className="mb-14">
 
           <p className="text-[#ea001e] uppercase tracking-[5px] mb-3">
@@ -107,8 +93,6 @@ export default function MyAddedCars() {
           </h1>
 
         </div>
-
-        {/* EMPTY STATE */}
 
         {cars.length === 0 && (
 
@@ -133,30 +117,20 @@ export default function MyAddedCars() {
 
         )}
 
-        {/* CARS GRID */}
-
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
           {cars.map((car) => (
 
             <div
               key={car._id}
-              className="bg-[#111111] border border-white/10 rounded-3xl overflow-hidden hover:border-[#ea001e] transition duration-500"
+              className="bg-[#111111] border border-white/10 rounded-3xl overflow-hidden"
             >
 
-              {/* IMAGE */}
-
-              <div className="overflow-hidden">
-
-                <img
-                  src={car.image}
-                  alt={car.carName}
-                  className="h-64 w-full object-cover hover:scale-110 transition duration-700"
-                />
-
-              </div>
-
-              {/* CONTENT */}
+              <img
+                src={car.image}
+                alt={car.carName}
+                className="h-64 w-full object-cover"
+              />
 
               <div className="p-6">
 
@@ -188,19 +162,6 @@ export default function MyAddedCars() {
 
                 </div>
 
-                <div className="flex items-center justify-between mb-6">
-
-                  <h3 className="text-3xl font-bold text-[#ea001e]">
-                    ${car.price}
-                    <span className="text-base text-gray-400">
-                      /day
-                    </span>
-                  </h3>
-
-                </div>
-
-                {/* BUTTONS */}
-
                 <div className="flex gap-4">
 
                   <Link
@@ -212,9 +173,7 @@ export default function MyAddedCars() {
 
                   <button
                     onClick={() =>
-                      handleDelete(
-                        car._id
-                      )
+                      handleDelete(car._id)
                     }
                     className="flex-1 border border-red-500 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition"
                   >

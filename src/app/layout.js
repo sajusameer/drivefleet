@@ -16,7 +16,7 @@ const inter = Inter({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning >
+    <html lang="en" suppressHydrationWarning  data-scroll-behavior="smooth">
       <body
         suppressHydrationWarning
         className={`${outfit.variable} ${inter.variable}`}
