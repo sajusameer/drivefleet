@@ -80,7 +80,7 @@ export default function SpecialOffers() {
             return (
               <div
                 key={index}
-                className="text-center group border shadow-xl rounded-2xl p-4"
+                className="text-center group border border-[#ea001e] shadow-xl rounded-2xl p-4"
               >
 
                 {/* ICON */}

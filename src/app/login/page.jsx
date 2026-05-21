@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
+import { FcGoogle } from "react-icons/fc";
 
 export default function LoginPage() {
 
@@ -89,12 +90,14 @@ export default function LoginPage() {
 
         </form>
 
-        <button
-          onClick={handleGoogleLogin}
-          className="w-full mt-4 bg-white text-black py-4 rounded-xl font-semibold"
-        >
-          Continue with Google
-        </button>
+       <button
+  type="button"
+  onClick={handleGoogleLogin}
+  className="w-full mt-4 bg-white text-black py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition"
+>
+  <FcGoogle className="text-xl" />
+  Continue with Google
+</button>
 
         <p className="text-center mt-6 text-gray-400">
 
