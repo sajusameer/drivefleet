@@ -1,54 +1,126 @@
-import { notFound } from "next/navigation";
+"use client";
 
-async function getCar(id) {
-  try {
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+
+export default function CarDetailsPage() {
+
+  const params = useParams();
+  const id = params.id;
+
+  const { data: session } =
+    authClient.useSession();
+
+  const [car, setCar] =
+    useState(null);
+
+  const [driverNeeded, setDriverNeeded] =
+    useState("No");
+
+  const [specialNote, setSpecialNote] =
+    useState("");
+
+  // =========================
+  // FETCH CAR
+  // =========================
+
+  useEffect(() => {
+
+    fetch(
+      `http://localhost:5000/cars/${id}`
+    )
+      .then((res) => res.json())
+      .then((data) => setCar(data));
+
+  }, [id]);
+
+  // =========================
+  // BOOK NOW
+  // =========================
+
+  const handleBooking = async () => {
+
+    if (!session?.user) {
+
+      alert("Please login first");
+      return;
+
+    }
+
+    const bookingData = {
+
+      carId: car._id,
+      carName: car.carName,
+      carImage: car.image,
+      price: car.price,
+
+      bookingDate:
+        new Date().toLocaleDateString(),
+
+      driverNeeded,
+      specialNote,
+
+      userEmail:
+        session.user.email,
+
+      userName:
+        session.user.name,
+
+    };
+
     const res = await fetch(
-      `http://localhost:5000/cars/${id}`,
+      "http://localhost:5000/bookings",
       {
-        cache: "no-store",
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify(
+          bookingData
+        ),
       }
     );
 
-    if (!res.ok) {
-      return null;
+    const data = await res.json();
+
+    if (data.insertedId) {
+
+      alert("Booking Successful");
+
     }
 
-    return res.json();
+  };
 
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
-
-export default async function CarDetails({ params }) {
-
-  const { id } = await params;
-
-  const car = await getCar(id);
+  // =========================
+  // LOADING
+  // =========================
 
   if (!car) {
-    notFound();
+
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white text-3xl">
+        Loading...
+      </div>
+    );
+
   }
 
   return (
-    <section className="min-h-screen bg-[#050505] text-white py-20 px-4 md:px-8 mt-8">
+    <section className="min-h-screen bg-[#050505] text-white py-28 px-6">
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12">
 
         {/* IMAGE */}
 
-        <div className="relative">
+        <div>
 
           <img
             src={car.image}
             alt={car.carName}
-            className="w-full h-[500px] object-cover rounded-3xl shadow-2xl border border-white/10"
+            className="w-full rounded-3xl h-[500px] object-cover"
           />
-
-          <div className="absolute top-5 left-5 bg-red-500 px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
-            {car.availability}
-          </div>
 
         </div>
 
@@ -56,85 +128,119 @@ export default async function CarDetails({ params }) {
 
         <div>
 
-          <p className="text-red-500 uppercase tracking-[4px] font-semibold mb-3">
-            Premium Car
+          <p className="text-[#ea001e] uppercase tracking-[5px] mb-1">
+            Luxury Vehicle
           </p>
 
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6">
+          <h1 className="text-3xl font-bold mb-1">
             {car.carName}
           </h1>
 
-          <p className="text-gray-400 text-lg leading-8 mb-8">
+          <p className="text-gray-400 leading-8 mb-2">
             {car.description}
           </p>
 
-          {/* INFO CARDS */}
+          <div className="space-y-1 mb-4 text-gray-300">
 
-          <div className="grid grid-cols-2 gap-4 mb-8">
+            <p>
+              Type: {car.carType}
+            </p>
 
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <p className="text-gray-400 text-sm mb-1">
-                Car Type
-              </p>
+            <p>
+              Seats: {car.seats}
+            </p>
 
-              <h3 className="text-xl font-bold">
-                {car.carType}
-              </h3>
-            </div>
+            <p>
+              Location: {car.location}
+            </p>
 
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <p className="text-gray-400 text-sm mb-1">
-                Seats
-              </p>
-
-              <h3 className="text-xl font-bold">
-                {car.seats}
-              </h3>
-            </div>
-
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <p className="text-gray-400 text-sm mb-1">
-                Location
-              </p>
-
-              <h3 className="text-xl font-bold">
-                {car.location}
-              </h3>
-            </div>
-
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <p className="text-gray-400 text-sm mb-1">
-                Status
-              </p>
-
-              <h3 className="text-xl font-bold text-green-400">
-                {car.availability}
-              </h3>
-            </div>
+            <p>
+              Availability:
+              {" "}
+              {car.availability}
+            </p>
 
           </div>
 
-          {/* PRICE */}
+          <h2 className="text-4xl font-bold text-[#ea001e] mb-10">
+            ${car.price}
+            <span className="text-lg text-gray-400">
+              /day
+            </span>
+          </h2>
 
-          <div className="flex items-center gap-3 mb-8">
+          {/* BOOKING FORM */}
 
-            <h2 className="text-5xl font-extrabold text-red-500">
-              ${car.price}
+          <div className="bg-[#111111] border border-white/10 rounded-3xl p-6 space-y-5">
+
+            <h2 className="text-2xl font-bold">
+              Book This Car
             </h2>
 
-            <span className="text-gray-400 text-xl">
-              / day
-            </span>
+            {/* DRIVER */}
+
+            <div>
+
+              <label className="block mb-2 text-gray-400">
+                Driver Needed?
+              </label>
+
+              <select
+                value={driverNeeded}
+                onChange={(e) =>
+                  setDriverNeeded(
+                    e.target.value
+                  )
+                }
+                className="w-full bg-black border border-white/10 rounded-xl p-4"
+              >
+
+                <option>
+                  Yes
+                </option>
+
+                <option>
+                  No
+                </option>
+
+              </select>
+
+            </div>
+
+            {/* NOTE */}
+
+            <div>
+
+              <label className="block mb-1 text-gray-400">
+                Special Note
+              </label>
+
+              <textarea
+                rows="2"
+                value={specialNote}
+                onChange={(e) =>
+                  setSpecialNote(
+                    e.target.value
+                  )
+                }
+                placeholder="Any special request..."
+                className="w-full bg-black border border-white/10 rounded-xl p-4"
+              />
+
+            </div>
+
+            {/* BUTTON */}
+
+            <button
+              onClick={handleBooking}
+              className="w-full bg-[#ea001e] hover:bg-red-700 transition py-4 rounded-2xl font-semibold text-lg"
+            >
+
+              Book Now
+
+            </button>
 
           </div>
-
-          {/* BUTTON */}
-
-          <button className="bg-red-500 hover:bg-red-600 transition-all duration-300 px-8 py-4 rounded-2xl text-lg font-bold shadow-lg hover:scale-105">
-
-            Book Now
-
-          </button>
 
         </div>
 
