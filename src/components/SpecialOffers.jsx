@@ -50,13 +50,13 @@ const services = [
 
 export default function SpecialOffers() {
   return (
-    <section className="bg-[#f4f4f4] py-24 px-4 md:px-10">
+    <section className="bg-[#f4f4f4] py-20 px-4 md:px-10">
 
       <div className="max-w-6xl mx-auto">
 
         {/* TITLE */}
 
-        <div className="flex items-center justify-center gap-5 mb-20">
+        <div className="flex items-center justify-center gap-3 mb-20">
 
           <div className="w-8 h-[5px] rounded-full bg-[#ea001e]" />
 
@@ -72,7 +72,7 @@ export default function SpecialOffers() {
 
         {/* SERVICES */}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-20 gap-x-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-15 gap-x-10">
 
           {services.map((service, index) => {
             const Icon = service.icon;
@@ -80,12 +80,12 @@ export default function SpecialOffers() {
             return (
               <div
                 key={index}
-                className="text-center group"
+                className="text-center group border shadow-xl rounded-2xl p-4"
               >
 
                 {/* ICON */}
 
-                <div className="flex justify-center mb-6">
+                <div className="flex justify-center mb-6  ">
 
                   <div className="transition-all duration-300 group-hover:scale-110">
 

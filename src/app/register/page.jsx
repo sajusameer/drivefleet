@@ -1,140 +1,218 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import toast from "react-hot-toast";
+import { authClient } from "@/lib/auth-client";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
     email: "",
-    photo: "",
+    image: "",
     password: "",
   });
 
+  // INPUT CHANGE
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  // 🔥 Password validation
+  // PASSWORD VALIDATION
   const validatePassword = (password) => {
     const hasUpper = /[A-Z]/.test(password);
     const hasLower = /[a-z]/.test(password);
-    const isLongEnough = password.length >= 6;
+    const hasLength = password.length >= 6;
 
-    return hasUpper && hasLower && isLongEnough;
+    return hasUpper && hasLower && hasLength;
   };
 
+  // REGISTER
   const handleRegister = async (e) => {
     e.preventDefault();
-
-    if (!validatePassword(form.password)) {
-      toast.error(
-        "Password must have uppercase, lowercase and min 6 characters"
-      );
-      return;
-    }
+    setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+      // VALIDATION
+      if (!validatePassword(form.password)) {
+        toast.error(
+          "Password must contain uppercase, lowercase and minimum 6 characters"
+        );
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await authClient.signUp.email({
+        email: form.email,
+        password: form.password,
+        name: form.name,
+        image: form.image || undefined,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.message || "Registration failed");
+      if (error) {
+        toast.error(error?.message || "Registration failed");
+        setLoading(false);
         return;
       }
 
       toast.success("Registration successful");
-      router.push("/login");
+
+      router.push("/");
+      router.refresh();
     } catch (error) {
       toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // 🔥 Fake Google login UI
-  const handleGoogleLogin = () => {
-    toast.success("Google registration successful");
-    router.push("/");
+  // GOOGLE REGISTER
+  const handleGoogleRegister = async () => {
+    setLoading(true);
+
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+    } catch (error) {
+      toast.error("Google sign up failed");
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white px-4">
+    <section className="min-h-screen bg-[#050505] flex items-center justify-center px-4 py-24">
 
-      <div className="w-full max-w-md bg-[#111] p-8 rounded-xl">
+      <div className="w-full max-w-md bg-[#111111] border border-white/10 rounded-3xl p-8 shadow-2xl">
 
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          Register
-        </h1>
+        {/* TITLE */}
+        <div className="text-center mb-8">
+          <p className="text-[#ea001e] uppercase tracking-[6px] mb-3">
+            Join DriveFleet
+          </p>
 
-        <form onSubmit={handleRegister} className="space-y-4">
+          <h1 className="text-4xl font-bold text-white">
+            Register
+          </h1>
+        </div>
 
-          <input
-            name="name"
-            placeholder="Name"
-            onChange={handleChange}
-            className="w-full p-3 rounded text-white border border-white"
-            required
-          />
+        {/* FORM */}
+        <form onSubmit={handleRegister} className="space-y-5">
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            onChange={handleChange}
-            className="w-full p-3 rounded text-white border border-white"
-            required
-          />
+          {/* NAME */}
+          <div>
+            <label className="text-sm text-gray-400 block mb-2">
+              Full Name
+            </label>
 
-          <input
-            name="photo"
-            placeholder="Photo URL"
-            onChange={handleChange}
-            className="w-full p-3 rounded text-white border border-white"
-            required
-          />
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              required
+              placeholder="Enter your name"
+              className="w-full bg-black border border-white/10 rounded-xl px-4 py-4 text-white outline-none focus:border-[#ea001e]"
+            />
+          </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            onChange={handleChange}
-            className="w-full p-3 rounded text-white border border-white"
-            required
-          />
+          {/* EMAIL */}
+          <div>
+            <label className="text-sm text-gray-400 block mb-2">
+              Email
+            </label>
 
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              placeholder="Enter your email"
+              className="w-full bg-black border border-white/10 rounded-xl px-4 py-4 text-white outline-none focus:border-[#ea001e]"
+            />
+          </div>
+
+          {/* PHOTO */}
+          <div>
+            <label className="text-sm text-gray-400 block mb-2">
+              Photo URL
+            </label>
+
+            <input
+              type="text"
+              name="image"
+              value={form.image}
+              onChange={handleChange}
+              placeholder="Enter photo URL (optional)"
+              className="w-full bg-black border border-white/10 rounded-xl px-4 py-4 text-white outline-none focus:border-[#ea001e]"
+            />
+          </div>
+
+          {/* PASSWORD */}
+          <div>
+            <label className="text-sm text-gray-400 block mb-2">
+              Password
+            </label>
+
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              placeholder="Enter password"
+              className="w-full bg-black border border-white/10 rounded-xl px-4 py-4 text-white outline-none focus:border-[#ea001e]"
+            />
+
+            <p className="text-xs text-gray-500 mt-2">
+              Must contain uppercase, lowercase & minimum 6 characters
+            </p>
+          </div>
+
+          {/* BUTTON */}
           <button
             type="submit"
-            className="w-full bg-red-500 py-3 rounded font-semibold"
+            disabled={loading}
+            className="w-full bg-[#ea001e] hover:bg-red-700 transition text-white py-4 rounded-xl font-semibold text-lg disabled:opacity-50"
           >
-            Register
+            {loading ? "Creating account..." : "Register"}
           </button>
         </form>
 
+        {/* DIVIDER */}
+        <div className="flex items-center gap-4 my-8">
+          <div className="flex-1 h-[1px] bg-white/10" />
+          <span className="text-gray-500 text-sm">OR</span>
+          <div className="flex-1 h-[1px] bg-white/10" />
+        </div>
+
+        {/* GOOGLE */}
         <button
-          onClick={handleGoogleLogin}
-          className="w-full mt-4 bg-blue-500 py-3 rounded font-semibold"
+          onClick={handleGoogleRegister}
+          disabled={loading}
+          className="w-full border border-white/10 hover:border-[#ea001e] transition text-white py-4 rounded-xl font-medium disabled:opacity-50"
         >
           Continue with Google
         </button>
 
-        <p className="text-center mt-4 text-sm">
+        {/* LOGIN */}
+        <p className="text-center text-gray-400 mt-8">
           Already have an account?{" "}
-          <Link href="/login" className="text-red-400">
+          <Link href="/login" className="text-[#ea001e] hover:underline">
             Login
           </Link>
         </p>
 
       </div>
-    </div>
+    </section>
   );
 }

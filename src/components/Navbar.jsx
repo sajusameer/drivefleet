@@ -1,226 +1,176 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
-import {
-  Menu,
-  X,
-  CarFront,
-  LayoutDashboard,
-  PlusCircle,
-  CalendarDays,
-  LogOut,
-} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Menu, X, CarFront, ChevronDown } from "lucide-react";
 
+import { authClient } from "@/lib/auth-client";
 import ThemeToggle from "./ThemeToggle";
 
 export default function MainNavbar() {
+  const router = useRouter();
 
   const [open, setOpen] = useState(false);
+  const [dropdown, setDropdown] = useState(false);
 
-  // =========================
-  // TEMP USER
-  // =========================
+  // SESSION
+  const { data: session, isPending } = authClient.useSession();
 
-  const user = true;
-
-  // const user = false;
-
-  // =========================
-  // NAV LINKS
-  // =========================
+  // LOGOUT
+  const handleLogout = async () => {
+    await authClient.signOut();
+    router.push("/login");
+    router.refresh();
+  };
 
   const navLinks = [
-    {
-      name: "Home",
-      href: "/",
-    },
-    {
-      name: "Explore Cars",
-      href: "/explore-cars",
-    },
+    { name: "Home", href: "/" },
+    { name: "Explore Cars", href: "/explore-cars" },
   ];
 
+  // fallback image
+  const avatarFallback = "/avatar.png"; // put this in /public
+
   return (
-    <header className="w-full border-b border-white/10 bg-[#0b0b0b]/95 backdrop-blur-md fixed top-0 left-0 z-50">
+    <header className="w-full border-b border-white/10 bg-[#0f0e0b] fixed top-0 left-0 z-50">
 
       <div className="max-w-7xl mx-auto px-6">
-
         <div className="h-24 flex items-center justify-between">
 
-          {/* =========================
-              LOGO
-          ========================= */}
-
-          <Link
-            href="/"
-            className="flex items-center gap-3"
-          >
-            <div className="w-11 h-11 rounded-xl bg-[#ea001e] flex items-center justify-center shadow-lg shadow-red-500/20">
-              <CarFront
-                size={24}
-                className="text-white"
-              />
-            </div>
-
-            <div>
-              <h1 className="text-3xl font-black text-white leading-none">
-                DriveFleet
-              </h1>
-
-              <p className="text-xs tracking-[4px] text-gray-500 uppercase mt-1">
-                Luxury Cars
-              </p>
-            </div>
+          {/* LOGO */}
+          <Link href="/" className="flex items-center gap-3">
+            <CarFront size={32} className="text-[#ea001e]" />
+            <h1 className="text-3xl font-bold text-white">
+              DriveFleet
+            </h1>
           </Link>
 
-          {/* =========================
-              DESKTOP NAV
-          ========================= */}
-
+          {/* DESKTOP MENU */}
           <nav className="hidden lg:flex items-center gap-10 text-white">
-
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="hover:text-[#ea001e] transition duration-300 font-medium"
+                className="hover:text-[#ea001e] transition"
               >
                 {link.name}
               </Link>
             ))}
 
-            {user && (
+            {session && (
               <>
-                <Link
-                  href="/add-car"
-                  className="hover:text-[#ea001e] transition duration-300 font-medium"
-                >
+                <Link href="/add-car" className="hover:text-[#ea001e]">
                   Add Car
                 </Link>
-
-                <Link
-                  href="/my-bookings"
-                  className="hover:text-[#ea001e] transition duration-300 font-medium"
-                >
+                <Link href="/my-bookings" className="hover:text-[#ea001e]">
                   My Bookings
                 </Link>
               </>
             )}
-
           </nav>
 
-          {/* =========================
-              RIGHT SIDE
-          ========================= */}
-
+          {/* RIGHT */}
           <div className="flex items-center gap-5">
 
             <ThemeToggle />
 
-            {/* =========================
-                USER DROPDOWN
-            ========================= */}
+            {/* LOADING */}
+            {isPending ? (
+              <div className="w-10 h-10 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+            ) : session ? (
+              <div className="relative">
 
-            {user ? (
+                {/* PROFILE BUTTON */}
+                <button
+                  onClick={() => setDropdown(!dropdown)}
+                  className="flex items-center gap-3"
+                >
 
-              <div className="relative group hidden lg:block">
-
-                {/* PROFILE */}
-
-                <div className="flex items-center gap-3 cursor-pointer">
-
-                  <img
-                    src="https://i.ibb.co/4pDNDk1/avatar.png"
-                    alt="user"
-                    className="w-11 h-11 rounded-full border-2 border-[#ea001e] object-cover"
+                  {/* FIXED IMAGE HANDLING */}
+                  <Image
+                    src={session.user.image || avatarFallback}
+                    alt="profile"
+                    width={42}
+                    height={42}
+                    className="rounded-full border-2 border-[#ea001e]"
                   />
 
-                </div>
+                  <ChevronDown size={18} className="text-white" />
+                </button>
 
                 {/* DROPDOWN */}
+                {dropdown && (
+                  <div className="absolute right-0 mt-4 w-60 bg-[#111111] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
 
-                <div className="absolute right-0 top-16 w-64 bg-[#111111] border border-white/10 rounded-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-300">
+                    <div className="p-4 border-b border-white/10">
+                      <h3 className="text-white font-semibold">
+                        {session.user.name}
+                      </h3>
+                      <p className="text-sm text-gray-400 truncate">
+                        {session.user.email}
+                      </p>
+                    </div>
 
-                  <Link
-                    href="/add-car"
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#ea001e] transition text-white"
-                  >
-                    <PlusCircle size={20} />
-                    Add Car
-                  </Link>
+                    <div className="flex flex-col">
+                      <Link href="/add-car" className="px-5 py-3 text-white hover:bg-[#ea001e] transition">
+                        Add Car
+                      </Link>
 
-                  <Link
-                    href="/my-bookings"
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#ea001e] transition text-white"
-                  >
-                    <CalendarDays size={20} />
-                    My Bookings
-                  </Link>
+                      <Link href="/my-bookings" className="px-5 py-3 text-white hover:bg-[#ea001e] transition">
+                        My Bookings
+                      </Link>
 
-                  <Link
-                    href="/my-added-cars"
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#ea001e] transition text-white"
-                  >
-                    <LayoutDashboard size={20} />
-                    My Added Cars
-                  </Link>
+                      <Link href="/my-added-cars" className="px-5 py-3 text-white hover:bg-[#ea001e] transition">
+                        My Added Cars
+                      </Link>
 
-                  <button
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#ea001e] transition text-white"
-                  >
-                    <LogOut size={20} />
-                    Logout
-                  </button>
-
-                </div>
-
+                      <button
+                        onClick={handleLogout}
+                        className="px-5 py-3 text-left text-red-500 hover:bg-red-500 hover:text-white transition"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-
             ) : (
+              <div className="hidden lg:flex items-center gap-4">
+                <Link
+                  href="/login"
+                  className="bg-[#ea001e] text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 transition"
+                >
+                  Login
+                </Link>
 
-              <Link
-                href="/login"
-                className="hidden lg:flex bg-[#ea001e] text-white px-7 py-3 rounded-xl font-semibold hover:bg-red-700 transition"
-              >
-                Login
-              </Link>
-
+                <Link
+                  href="/register"
+                  className="border border-[#ea001e] text-[#ea001e] px-6 py-3 rounded-xl font-semibold hover:bg-[#ea001e] hover:text-white transition"
+                >
+                  Register
+                </Link>
+              </div>
             )}
 
-            {/* =========================
-                MOBILE MENU BUTTON
-            ========================= */}
-
+            {/* MOBILE BUTTON */}
             <button
               onClick={() => setOpen(!open)}
               className="text-white lg:hidden"
             >
-              {open ? (
-                <X size={32} />
-              ) : (
-                <Menu size={32} />
-              )}
+              {open ? <X size={30} /> : <Menu size={30} />}
             </button>
-
           </div>
-
         </div>
-
       </div>
 
-      {/* =========================
-          MOBILE MENU
-      ========================= */}
-
+      {/* MOBILE MENU */}
       <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 bg-[#111111] border-t border-white/10 ${
-          open
-            ? "max-h-[700px] py-6"
-            : "max-h-0"
+        className={`lg:hidden bg-[#111111] border-t border-white/10 overflow-hidden transition-all duration-300 ${
+          open ? "max-h-[700px] py-6" : "max-h-0"
         }`}
       >
-
         <div className="px-6 flex flex-col gap-5">
 
           {navLinks.map((link) => (
@@ -228,52 +178,37 @@ export default function MainNavbar() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="text-white hover:text-[#ea001e] transition text-lg"
+              className="text-white hover:text-[#ea001e]"
             >
               {link.name}
             </Link>
           ))}
 
-          {user ? (
+          {session ? (
             <>
+              <Link href="/add-car" className="text-white">Add Car</Link>
+              <Link href="/my-bookings" className="text-white">My Bookings</Link>
+              <Link href="/my-added-cars" className="text-white">My Added Cars</Link>
 
-              <Link
-                href="/add-car"
-                className="text-white hover:text-[#ea001e] transition text-lg"
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white px-5 py-3 rounded-xl"
               >
-                Add Car
-              </Link>
-
-              <Link
-                href="/my-bookings"
-                className="text-white hover:text-[#ea001e] transition text-lg"
-              >
-                My Bookings
-              </Link>
-
-              <Link
-                href="/my-added-cars"
-                className="text-white hover:text-[#ea001e] transition text-lg"
-              >
-                My Added Cars
-              </Link>
-
-              <button className="bg-[#ea001e] text-white px-6 py-3 rounded-xl font-semibold mt-2">
                 Logout
               </button>
-
             </>
           ) : (
-            <Link
-              href="/login"
-              className="bg-[#ea001e] text-white px-6 py-3 rounded-xl font-semibold text-center"
-            >
-              Login
-            </Link>
+            <>
+              <Link href="/login" className="bg-[#ea001e] text-white px-5 py-3 rounded-xl text-center">
+                Login
+              </Link>
+
+              <Link href="/register" className="border border-[#ea001e] text-[#ea001e] px-5 py-3 rounded-xl text-center">
+                Register
+              </Link>
+            </>
           )}
-
         </div>
-
       </div>
 
     </header>

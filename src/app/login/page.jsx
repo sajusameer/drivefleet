@@ -1,106 +1,158 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import toast from "react-hot-toast";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
 
+  // INPUT CHANGE
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
   };
 
+  // LOGIN EMAIL/PASSWORD
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+      const { error } = await authClient.signIn.email({
+        email: form.email,
+        password: form.password,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.message || "Login failed");
+      if (error) {
+        toast.error(error?.message || "Login failed");
         return;
       }
 
       toast.success("Login successful");
+
       router.push("/");
+      router.refresh();
     } catch (error) {
       toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // 🔥 Fake Google login (backend na thakle UI ready)
-  const handleGoogleLogin = () => {
-    toast.success("Google login successful");
-    router.push("/");
+  // GOOGLE LOGIN
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+    } catch (error) {
+      toast.error("Google login failed");
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white px-4">
+    <section className="min-h-screen bg-[#050505] flex items-center justify-center px-4 py-24">
 
-      <div className="w-full max-w-md bg-[#111] p-8 rounded-xl">
+      <div className="w-full max-w-md bg-[#111111] border border-white/10 rounded-3xl p-8 shadow-2xl">
 
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          Login
-        </h1>
+        {/* TITLE */}
+        <div className="text-center mb-8">
+          <p className="text-[#ea001e] uppercase tracking-[6px] mb-3">
+            Welcome Back
+          </p>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+          <h1 className="text-4xl font-bold text-white">
+            Login
+          </h1>
+        </div>
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            onChange={handleChange}
-            className="w-full p-3 rounded text-white border border-white"
-            required
-          />
+        {/* FORM */}
+        <form onSubmit={handleLogin} className="space-y-5">
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            onChange={handleChange}
-            className="w-full p-3 rounded text-white border border-white"
-            required
-          />
+          {/* EMAIL */}
+          <div>
+            <label className="text-sm text-gray-400 block mb-2">
+              Email
+            </label>
 
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              placeholder="Enter your email"
+              className="w-full bg-black border border-white/10 rounded-xl px-4 py-4 text-white outline-none focus:border-[#ea001e]"
+            />
+          </div>
+
+          {/* PASSWORD */}
+          <div>
+            <label className="text-sm text-gray-400 block mb-2">
+              Password
+            </label>
+
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              placeholder="Enter password"
+              className="w-full bg-black border border-white/10 rounded-xl px-4 py-4 text-white outline-none focus:border-[#ea001e]"
+            />
+          </div>
+
+          {/* BUTTON */}
           <button
             type="submit"
-            className="w-full bg-red-500 py-3 rounded font-semibold"
+            disabled={loading}
+            className="w-full bg-[#ea001e] hover:bg-red-700 transition text-white py-4 rounded-xl font-semibold text-lg disabled:opacity-50"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
+        {/* DIVIDER */}
+        <div className="flex items-center gap-4 my-8">
+          <div className="flex-1 h-[1px] bg-white/10" />
+          <span className="text-gray-500 text-sm">OR</span>
+          <div className="flex-1 h-[1px] bg-white/10" />
+        </div>
+
+        {/* GOOGLE LOGIN */}
         <button
           onClick={handleGoogleLogin}
-          className="w-full mt-4 bg-blue-500 py-3 rounded font-semibold"
+          disabled={loading}
+          className="w-full border border-white/10 hover:border-[#ea001e] transition text-white py-4 rounded-xl font-medium disabled:opacity-50"
         >
           Continue with Google
         </button>
 
-        <p className="text-center mt-4 text-sm">
-          Don’t have an account?{" "}
-          <Link href="/register" className="text-red-400">
+        {/* REGISTER */}
+        <p className="text-center text-gray-400 mt-8">
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="text-[#ea001e] hover:underline">
             Register
           </Link>
         </p>
-
       </div>
-    </div>
+    </section>
   );
 }
