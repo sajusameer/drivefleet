@@ -182,15 +182,15 @@ export default function CarDetailsPage() {
 
         <div>
 
-          <p className="text-red-500 uppercase tracking-[5px] mb-3">
+          <p className="text-red-500 uppercase tracking-[5px] mb-2">
             Premium Car
           </p>
 
-          <h1 className="text-5xl font-bold mb-6">
+          <h1 className="text-5xl font-bold mb-2">
             {car.carName}
           </h1>
 
-          <div className="space-y-4 text-gray-300 mb-8">
+          <div className="space-y-4 text-gray-300 mb-2">
 
             <p>
               Type: {car.carType}
@@ -218,11 +218,11 @@ export default function CarDetailsPage() {
 
           </div>
 
-          <p className="text-gray-400 leading-8 mb-8">
+          <p className="text-gray-400 leading-8 mb-2">
             {car.description}
           </p>
 
-          <h2 className="text-4xl font-bold text-red-500 mb-10">
+          <h2 className="text-4xl font-bold text-red-500 mb-8">
 
             ${car.price}
 
@@ -234,7 +234,7 @@ export default function CarDetailsPage() {
 
           {/* BOOKING FORM */}
 
-          <div className="space-y-5">
+          <div className="space-y-4">
 
             <select
               value={driverNeeded}
@@ -257,7 +257,7 @@ export default function CarDetailsPage() {
             </select>
 
             <textarea
-              rows="5"
+              rows="2"
               placeholder="Special Note"
               value={specialNote}
               onChange={(e) =>
@@ -265,7 +265,7 @@ export default function CarDetailsPage() {
                   e.target.value
                 )
               }
-              className="w-full bg-[#111111] border border-white/10 rounded-2xl px-5 py-4"
+              className="w-full bg-[#111111] border border-white/10 rounded-2xl px-5 py-2"
             />
 
             <button

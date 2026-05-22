@@ -66,7 +66,7 @@ export default function AvailableCars() {
   }
 
   return (
-    <section className="bg-[#050505] text-white py-28 px-6">
+    <section className="bg-[#050505] text-white py-4 px-6">
 
       <div className="max-w-7xl mx-auto">
 
@@ -189,7 +189,7 @@ export default function AvailableCars() {
                 {/* BUTTON */}
 
                 <Link
-                  href={`/car/${car._id}`}
+                 href={`/cars/${car._id}`}
                   className="block text-center bg-[#ea001e] py-4 rounded-2xl font-semibold hover:bg-red-700 transition"
                 >
                   View Details
