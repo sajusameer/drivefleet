@@ -18,7 +18,7 @@ export default function AvailableCars() {
   useEffect(() => {
 
     fetch(
-      "http://localhost:5000/cars"
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/cars`  
     )
       .then((res) => res.json())
       .then((data) => {
@@ -66,7 +66,7 @@ export default function AvailableCars() {
   }
 
   return (
-    <section className="bg-[#050505] text-white py-4 px-6">
+    <section className="bg-[#050505] text-white py-8 px-6">
 
       <div className="max-w-7xl mx-auto">
 

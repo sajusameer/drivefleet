@@ -33,7 +33,7 @@ export default function CarDetailsPage() {
   useEffect(() => {
 
     fetch(
-      `http://localhost:5000/cars/${id}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/cars/${id}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -102,7 +102,7 @@ export default function CarDetailsPage() {
       };
 
       const res = await fetch(
-        "http://localhost:5000/bookings",
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/bookings`,
         {
           method: "POST",
 

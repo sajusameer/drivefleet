@@ -60,7 +60,7 @@ export default function AddCarPage() {
     };
 
     const res = await fetch(
-      "http://localhost:5000/cars",
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/cars`,
       {
         method: "POST",
 
@@ -172,7 +172,7 @@ export default function AddCarPage() {
 
           <textarea
             name="description"
-            rows="6"
+            rows="3"
             placeholder="Description"
             className="bg-black border border-white/10 rounded-xl p-4 md:col-span-2"
           />

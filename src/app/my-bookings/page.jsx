@@ -29,7 +29,7 @@
 //         try {
 
 //           const res = await fetch(
-//             `http://localhost:5000/my-bookings/${session.user.email}`
+//             `/my-bookings/${session.user.email}`
 //           );
 
 //           const data =
@@ -216,7 +216,7 @@ export default function MyBookingsPage() {
         setLoading(true);
 
         const res = await fetch(
-          `http://localhost:5000/my-bookings/${session.user.email}`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/my-bookings/${session.user.email}`
         );
 
         const data = await res.json();

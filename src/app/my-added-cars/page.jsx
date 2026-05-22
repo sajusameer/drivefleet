@@ -18,7 +18,7 @@ export default function MyAddedCars() {
     if (!session?.user?.email) return;
 
     fetch(
-      `http://localhost:5000/my-cars/${session.user.email}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/my-cars/${session.user.email}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -43,7 +43,7 @@ export default function MyAddedCars() {
     if (!confirmDelete) return;
 
     const res = await fetch(
-      `http://localhost:5000/cars/${id}`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/cars/${id}`,
       {
         method: "DELETE",
       }

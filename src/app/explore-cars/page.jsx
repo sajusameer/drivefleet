@@ -25,7 +25,7 @@ export default function ExploreCars() {
         setLoading(true);
 
         const res = await fetch(
-          `http://localhost:5000/cars?search=${search}&type=${type}`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/cars?search=${search}&type=${type}`
         );
 
         const data = await res.json();
