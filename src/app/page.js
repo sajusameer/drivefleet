@@ -1,3 +1,4 @@
+import AvailableCars from '@/components/AvailableCars';
 import HeroSection from '@/components/HeroSection';
 import SpecialOffers from '@/components/SpecialOffers';
 import Testimonials from '@/components/Testimonials';
@@ -7,6 +8,7 @@ const page = () => {
   return (
  <main>
       <HeroSection />
+      <AvailableCars/>
       <SpecialOffers/>
       <Testimonials/>
     </main>
